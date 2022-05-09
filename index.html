@@ -177,8 +177,6 @@ function handleConnectionChange(event) {
   console.log('ICE state change event: ', event);
 }
 
-accessToken = document.getElementById(secret);
-projectId = document.getElementById(projectId);
 selectedAPI = "https://smartdevicemanagement.googleapis.com/v1";
 
 initializeWebRTC();
@@ -193,9 +191,9 @@ initializeWebRTC();
 <input type="text" id="secret" name="secret">
 <input type="text" id="deviceId" name="deviceId">
 
-	<button onclick="onGenerateStream_WebRTC(document.getElementById(deviceId), offerSDP)" value="Start" title="Start">Start</button>
+	<button onclick="onGenerateStream_WebRTC(document.getElementById('deviceId'), offerSDP)" value="Start" title="Start">Start</button>
  
- <button onclick="onStopStream_WebRTC(document.getElementById(deviceId))" value="Stop" title="Stop">Stop</button>
+ <button onclick="onStopStream_WebRTC(document.getElementById('deviceId'))" value="Stop" title="Stop">Stop</button>
  
  
  <video id="video-stream" style="width: 300px" autoplay playsinline></video>

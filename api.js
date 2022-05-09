@@ -96,6 +96,10 @@ function onListDevices() {
 
 /** onGenerateStream_WebRTC - Issues a GenerateWebRtcStream request */
 function onGenerateStream_WebRTC(deviceId, offerSDP) {
+  projectId = document.getElementById('projectId');
+  accessToken = document.getElementById('secret');
+
+
   let endpoint = "/enterprises/" + projectId + "/devices/" + deviceId + ":executeCommand";
   let payload = {
     "command": "sdm.devices.commands.CameraLiveStream.GenerateWebRtcStream",
