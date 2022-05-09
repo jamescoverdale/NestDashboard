@@ -96,8 +96,8 @@ function onListDevices() {
 
 /** onGenerateStream_WebRTC - Issues a GenerateWebRtcStream request */
 function onGenerateStream_WebRTC(deviceId, offerSDP) {
-  projectId = document.getElementById('projectId');
-  accessToken = document.getElementById('secret');
+  projectId = document.getElementById('projectId').value;
+  accessToken = document.getElementById('secret').value;
 
 
   let endpoint = "/enterprises/" + projectId + "/devices/" + deviceId + ":executeCommand";
