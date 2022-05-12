@@ -1,0 +1,21 @@
+﻿@using Google.Apis.SmartDeviceManagement.v1.Data
+@model List<GoogleHomeEnterpriseSdmV1Device>
+
+@{
+}
+
+@foreach(var device in Model)
+{    
+     @if (device.Traits.ContainsKey("sdm.devices.traits.Humidity"))
+    {
+        
+        <iframe src="nest/GetThermostatDetails?id=@device.Name" style="width:200px; height: 500px; border:hidden"></iframe>     
+    }  
+
+    @if (device.Traits.ContainsKey("sdm.devices.traits.CameraLiveStream"))
+    {
+        
+        <iframe src="nest/Watch?id=@device.Name" style="width:820px; height: 500px;border:hidden; overflow:hidden"></iframe>       
+    }    
+}
+

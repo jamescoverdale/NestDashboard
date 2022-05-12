@@ -1,0 +1,195 @@
+﻿@using Google.Apis.SmartDeviceManagement.v1.Data
+@{
+}
+
+@model GoogleHomeEnterpriseSdmV1Device
+
+<script>
+    // WebRTC Variables:
+
+let localPeerConnection;
+let localSendChannel;
+let localStream;
+let remoteStream;
+let offerSDP = "";
+
+let initialized = false;
+
+
+// WebRTC Configurations:
+
+const localOfferOptions = {
+  offerToReceiveVideo: 1,
+  offerToReceiveAudio: 1,
+};
+
+const mediaStreamConstraints = {
+  audio: false,
+  video: false,
+};
+
+
+
+/// WebRTC Functions ///
+
+/** initializeWebRTC - Triggers starting a new WebRTC stream on initialization */
+function initializeWebRTC() {
+  if(initialized===true)
+    return;
+  console.log(`initializeWebRTC()`);
+  initialized = true;
+  startLocalStream();
+}
+
+/** startLocalStream - Starts a WebRTC stream on the browser */
+function startLocalStream(mediaStream) {
+  console.log(`startLocalStream()`);
+  localPeerConnection = null;
+  localSendChannel = null;
+  localStream = null;
+  offerSDP = "";
+
+  remoteStream = new MediaStream();
+
+  const servers = { 'sdpSemantics': 'unified-plan', 'iceServers': []  };
+  localPeerConnection = new RTCPeerConnection(servers);
+  localPeerConnection.ondatachannel = receiveChannelCallback;
+
+  localSendChannel = localPeerConnection.createDataChannel('dataSendChannel', null);
+  //localPeerConnection.addEventListener('iceconnectionstatechange', handleConnectionChange);
+
+  if(mediaStream) {
+    mediaStream.getTracks().forEach((track) => {
+      localPeerConnection.addTrack(track, mediaStream);
+      console.log(`track added!`);
+    });
+    localStream = mediaStream;
+  }
+
+  localPeerConnection.addEventListener('track', gotRemoteMediaTrack);
+
+  console.log('localPeerConnection createOffer start.');
+  localPeerConnection.createOffer(localOfferOptions)
+      .then(createdOffer).catch();
+}
+
+/** createdOffer - Handles local offerSDP creation */
+function createdOffer(description) {
+  console.log(`createdOffer()`);
+  //updateOfferSDP(description.sdp);
+  offerSDP = description.sdp;
+  localPeerConnection.setLocalDescription(description)
+      .then(() => {
+       
+      }).catch();
+}
+
+/** updateWebRTC - Updates WebRTC connection on receiving answerSDP */
+function updateWebRTC(answerSDP) {
+  console.log(`Answer from remotePeerConnection:\n${answerSDP}.`);
+  if (answerSDP[answerSDP.length - 1] !== '\n') {
+    answerSDP += '\n';
+  }
+
+  localPeerConnection.setRemoteDescription({ "type": "answer", "sdp": answerSDP })
+      .then(() => {
+        
+      }).catch();
+}
+// Helper Functions ///
+
+
+/** gotRemoteMediaTrack - Handles received media track */
+function gotRemoteMediaTrack(event) {
+  console.log(`gotRemoteMediaTrack()`);
+  remoteStream.addTrack(event.track);
+  document.getElementById("video-stream").srcObject = remoteStream;
+  console.log('Received remote track.');
+}
+
+/** receiveChannelCallback - Handles received channel callback */
+const receiveChannelCallback = (event) => {
+  console.log('receiveChannelCallback');
+  const receiveChannel = event.channel;
+ // receiveChannel.onmessage = handleReceiveMessage;
+};
+
+selectedAPI = "https://smartdevicemanagement.googleapis.com/v1";
+
+initializeWebRTC();
+
+function startStream(id, offer) {
+
+    const req = {
+    id: id,
+    offerSdp: offerSDP    
+  }
+
+
+    fetch("GenerateWebRtc",
+        {
+            method: "POST",
+            body: JSON.stringify(req),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+      .then(response => {
+        // indicates whether the response is successful (status code 200-299) or not
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${reponse.status}`)
+        }        
+
+        return response.json()
+      })
+      .then(data => {
+        console.log(data)
+        currentMediaSessionId = data.mediaSessionId;
+        currentCamId = id;
+        updateWebRTC(data.answerSdp);
+      })
+      .catch(error => console.log(error))
+
+    
+}
+currentMediaSessionId = "";
+currentCamId = "";
+function stopStream() {
+
+    const req = {
+    id: currentCamId,
+    mediaId: currentMediaSessionId    
+  }
+
+    fetch("StopWebRtc",
+        {
+            method: "POST",
+            body: JSON.stringify(req),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+      .then(response => {
+        // indicates whether the response is successful (status code 200-299) or not
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${reponse.status}`)
+        }        
+
+        return response.json()
+      })
+      .then(data => {
+        console.log(data)   
+        initialized = false;
+        initializeWebRTC();
+      })
+      .catch(error => console.log(error))
+
+    
+}
+
+</script>
+<h3>@(((Newtonsoft.Json.Linq.JObject)@Model.Traits["sdm.devices.traits.Info"])["customName"])</h3>
+<video id="video-stream" style="height: 400px" autoplay playsinline></video>
+<br /><br />
+<button onclick="startStream('@Model.Name', offerSDP)" value="Start" title="Start">Start</button>
+<button onclick="stopStream()" value="Stop" title="Stop">Stop</button>

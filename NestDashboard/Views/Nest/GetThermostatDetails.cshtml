@@ -1,0 +1,25 @@
+﻿@using Google.Apis.SmartDeviceManagement.v1.Data
+@model GoogleHomeEnterpriseSdmV1Device
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<h3>Thermostat</h3>
+
+@if(Model.Traits.ContainsKey("sdm.devices.traits.Humidity"))
+{
+    <span>Humidity: @(((Newtonsoft.Json.Linq.JObject)@Model.Traits["sdm.devices.traits.Humidity"])["ambientHumidityPercent"])% </span><br />
+}  
+
+@if(Model.Traits.ContainsKey("sdm.devices.traits.Temperature"))
+{    
+    <span>Ambient Temp: @(((Newtonsoft.Json.Linq.JObject)@Model.Traits["sdm.devices.traits.Temperature"])["ambientTemperatureCelsius"])c </span><br />
+}
+
+@if(Model.Traits.ContainsKey("sdm.devices.traits.ThermostatTemperatureSetpoint"))
+{    
+    <span>Heat Set Temp: @(((Newtonsoft.Json.Linq.JObject)@Model.Traits["sdm.devices.traits.ThermostatTemperatureSetpoint"])["heatCelsius"])c </span><br />
+}
