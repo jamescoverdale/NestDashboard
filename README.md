@@ -12,7 +12,7 @@ Set the following enviromental variables:
 
 ```bash
 
-docker run -d -p 80:80 -e PROJECTID:123xyz456 -e CLIENTID:googleclientid.com -e SECRET:clientsecret ghcr.io/jamescoverdale/nestdashboard:latest
+docker run -d -p 80:80 -e PROJECTID=123xyz456 -e CLIENTID=googleclientid.com -e SECRET=clientsecret ghcr.io/jamescoverdale/nestdashboard:latest
 
 ```
  
