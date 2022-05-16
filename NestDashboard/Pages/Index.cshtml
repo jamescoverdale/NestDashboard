@@ -4,7 +4,76 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+
+<div class="text-center">   
+    @if (Model.Devices != null)
+    {
+        <div class="row">
+            @if(Model.Devices.Any(t => t.Traits.ContainsKey("sdm.devices.traits.Humidity")))
+            {
+                var device = Model.Devices.Single(t => t.Traits.ContainsKey("sdm.devices.traits.Humidity"));
+                
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-35 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Thermostat</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+
+
+                                        @if (device.Traits.ContainsKey("sdm.devices.traits.Humidity"))
+                                        {
+                                            <span>Humidity: @(((Newtonsoft.Json.Linq.JObject)@device.Traits["sdm.devices.traits.Humidity"])["ambientHumidityPercent"])% </span><br />
+                                        }  
+
+                                            @if(device.Traits.ContainsKey("sdm.devices.traits.Temperature"))
+                                            {    
+                                                <span>Ambient Temp: @(((Newtonsoft.Json.Linq.JObject)@device.Traits["sdm.devices.traits.Temperature"])["ambientTemperatureCelsius"])c </span><br />
+                                            }
+
+                                            @if(device.Traits.ContainsKey("sdm.devices.traits.ThermostatTemperatureSetpoint"))
+                                            {    
+                                                <span>Heat Set Temp: @(((Newtonsoft.Json.Linq.JObject)@device.Traits["sdm.devices.traits.ThermostatTemperatureSetpoint"])["heatCelsius"])c </span><br />
+                                            }
+
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            }
+        </div>
+        <div class="row">
+        @foreach (var device in Model.Devices)
+        {            
+
+            @if (device.Traits.ContainsKey("sdm.devices.traits.CameraLiveStream"))
+            {
+                if(device.Type == "sdm.devices.types.DOORBELL")
+                {
+                    <div class="col-xl-4 col-md-4 mb-4">
+                        <iframe src="nest/Watch?id=@device.Name" style="width:100%; height: 800px;border:hidden; overflow:hidden"></iframe>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-xl-6 col-md-6 mb-4">
+                        <iframe src="nest/Watch?id=@device.Name" style="width:100%; height: 500px;border:hidden; overflow:hidden"></iframe>
+                    </div>
+                }
+
+                
+            }
+
+        }
+        </div>
+
+    }
 </div>

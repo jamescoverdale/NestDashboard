@@ -4,6 +4,15 @@
 
 @model GoogleHomeEnterpriseSdmV1Device
 
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - NestDashboard</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/NestDashboard.styles.css" asp-append-version="true" />
+</head>
+
 <script>
     // WebRTC Variables:
 
@@ -188,8 +197,39 @@ function stopStream() {
 }
 
 </script>
-<h3>@(((Newtonsoft.Json.Linq.JObject)@Model.Traits["sdm.devices.traits.Info"])["customName"])</h3>
-<video id="video-stream" style="height: 400px" autoplay playsinline></video>
-<br /><br />
-<button onclick="startStream('@Model.Name', offerSDP)" value="Start" title="Start">Start</button>
-<button onclick="stopStream()" value="Stop" title="Stop">Stop</button>
+
+
+<div class="card border-left-primary shadow h-@(Model.Type == "sdm.devices.types.DOORBELL" ? "100" : "70") py-2">
+    <div class="card-body">
+        <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                    @(((Newtonsoft.Json.Linq.JObject)@Model.Traits["sdm.devices.traits.Info"])["customName"])</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">                                            
+
+                    <video id="video-stream" style="height: 75%; width:100%" autoplay playsinline></video>
+                    <br /><br />
+
+                    <a href="#" class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-flag"></i>
+                    </span>
+                    <span onclick="startStream('@Model.Name', offerSDP)" class="text">Start</span>
+                    </a>
+
+                    <a href="#" class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-flag"></i>
+                    </span>
+                    <span onclick="stopStream()" class="text">Stop</span>
+                    </a>
+                                           
+
+                </div>
+            </div>
+            <div class="col-auto">
+                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+            </div>
+        </div>
+    </div>
+</div>
